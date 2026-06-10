@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git checkout *)",
+      "Bash(powershell -Command \"New-Item -ItemType Directory -Force src/lib, src/middleware, src/controllers, src/routes\")",
+      "Bash(npm install *)",
+      "Bash(git add *)",
+      "Bash(git restore *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git commit *)",
+      "Bash(node -e \"require\\('./src/lib/db'\\)\")",
+      "Bash(node -e \"require\\('./src/lib/spark'\\)\")",
+      "Bash(node -e \"require\\('./src/middleware/authMiddleware'\\)\")",
+      "Bash(node -e \"require\\('./src/controllers/listingsController'\\)\")",
+      "Bash(node -e \"require\\('./src/controllers/leadsController'\\)\")",
+      "Bash(node -e \"require\\('./src/controllers/authController'\\)\")",
+      "Bash(node -e \"require\\('./src/routes/listings'\\); require\\('./src/routes/leads'\\); require\\('./src/routes/auth'\\); console.log\\('OK'\\)\")",
+      "Bash(node --check src/server.js)",
+      "Bash(node --check seed.js)",
+      "Bash(node --check \"D:/Projects/digital vistech/buy treasure branco smm/website/buy-treasure-custom/backend/src/server.js\")",
+      "Bash(node --check \"D:/Projects/digital vistech/buy treasure branco smm/website/buy-treasure-custom/backend/src/lib/spark.js\")",
+      "Bash(npm test *)"
+    ]
+  }
+}
