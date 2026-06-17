@@ -2,8 +2,8 @@ const spark = require('../lib/spark');
 
 async function fetchListings(req, res, listingType) {
   try {
-    const { page = 1, limit = 20, minPrice, maxPrice, beds, baths, city, propertyType } = req.query;
-    const data = await spark.getListings({ page, limit, minPrice, maxPrice, beds, baths, city, propertyType, listingType });
+    const { page = 1, limit = 20, minPrice, maxPrice, beds, baths, city, propertyType, sortBy } = req.query;
+    const data = await spark.getListings({ page, limit, minPrice, maxPrice, beds, baths, city, propertyType, listingType, sortBy });
     res.json({
       listings: data.value || [],
       total: data['@odata.count'] || 0,
@@ -17,9 +17,10 @@ async function fetchListings(req, res, listingType) {
   }
 }
 
-async function getListings(req, res)     { return fetchListings(req, res, null); }
-async function getSaleListings(req, res) { return fetchListings(req, res, 'sale'); }
-async function getRentListings(req, res) { return fetchListings(req, res, 'rent'); }
+async function getListings(req, res)         { return fetchListings(req, res, null); }
+async function getSaleListings(req, res)     { return fetchListings(req, res, 'sale'); }
+async function getRentListings(req, res)     { return fetchListings(req, res, 'rent'); }
+async function getFilteredListings(req, res) { return fetchListings(req, res, req.query.type || null); }
 
 async function getListing(req, res) {
   try {
@@ -49,4 +50,4 @@ async function getListingPhotos(req, res) {
   }
 }
 
-module.exports = { getListings, getSaleListings, getRentListings, getListing, getListingPhotos };
+module.exports = { getListings, getSaleListings, getRentListings, getFilteredListings, getListing, getListingPhotos };

@@ -39,25 +39,33 @@ function sparkHeaders() {
   };
 }
 
-async function getListings({ page = 1, limit = 20, minPrice, maxPrice, beds, baths, city, propertyType, listingType } = {}) {
-  const top  = Math.min(Math.max(Number(limit) || 1, 1), 100);
+const SORT_MAP = {
+  'newest':       'ListingContractDate desc',
+  'price-low':    'ListPrice asc',
+  'price-high':   'ListPrice desc',
+};
+
+async function getListings({ page = 1, limit = 20, minPrice, maxPrice, beds, baths, city, propertyType, listingType, sortBy } = {}) {
+  const top      = Math.min(Math.max(Number(limit) || 1, 1), 100);
   const safePage = Math.max(Number(page) || 1, 1);
-  const skip = (safePage - 1) * top;
+  const skip     = (safePage - 1) * top;
+  const orderby  = SORT_MAP[sortBy] || SORT_MAP['newest'];
 
   const filters = ["StandardStatus eq 'Active'"];
-  if (minPrice)       filters.push(`ListPrice ge ${Number(minPrice)}`);
-  if (maxPrice)       filters.push(`ListPrice le ${Number(maxPrice)}`);
-  if (beds)           filters.push(`BedroomsTotal ge ${Number(beds)}`);
-  if (baths)          filters.push(`BathroomsTotalInteger ge ${Number(baths)}`);
+  if (minPrice) filters.push(`ListPrice ge ${Number(minPrice)}`);
+  if (maxPrice) filters.push(`ListPrice le ${Number(maxPrice)}`);
+  if (beds)     filters.push(`BedroomsTotal ge ${Number(beds)}`);
+  if (baths)    filters.push(`BathroomsTotalInteger ge ${Number(baths)}`);
+
   const resolvedCity = resolveCity(city);
   if (resolvedCity) {
     filters.push(`City eq '${escOData(resolvedCity)}'`);
   } else {
-    // Default: restrict to Treasure Coast area only
     const cityFilter = TREASURE_COAST_CITIES.map(c => `City eq '${c}'`).join(' or ');
     filters.push(`(${cityFilter})`);
   }
-  if (propertyType)   filters.push(`PropertyType eq '${escOData(propertyType)}'`);
+
+  if (propertyType)          filters.push(`PropertyType eq '${escOData(propertyType)}'`);
   if (listingType === 'rent') filters.push("PropertyType eq 'Residential Lease'");
   if (listingType === 'sale') filters.push("PropertyType ne 'Residential Lease'");
 
@@ -67,7 +75,7 @@ async function getListings({ page = 1, limit = 20, minPrice, maxPrice, beds, bat
       $top: top,
       $skip: skip,
       $filter: filters.join(' and '),
-      $orderby: 'ListingContractDate desc',
+      $orderby: orderby,
       $count: true,
       $expand: 'Media($top=4)',
     },
@@ -79,6 +87,7 @@ async function getListings({ page = 1, limit = 20, minPrice, maxPrice, beds, bat
 async function getListing(listingKey) {
   const response = await axios.get(`${BASE_URL}/Property('${escOData(listingKey)}')`, {
     headers: sparkHeaders(),
+    params: { $expand: 'Media' },
   });
   return response.data;
 }
