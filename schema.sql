@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS leads (
   listing_key      VARCHAR(255),
   listing_address  VARCHAR(255),
   listing_price    VARCHAR(50),
+  lead_type        ENUM('listing-detail', 'popup-form'),
   created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

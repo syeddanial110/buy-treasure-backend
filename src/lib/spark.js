@@ -27,9 +27,11 @@ const CITY_SLUG_MAP = {
   'sebastian':      'Sebastian',
 };
 
+const VALID_CITY_SLUGS = Object.keys(CITY_SLUG_MAP);
+
 function resolveCity(city) {
   if (!city) return null;
-  return CITY_SLUG_MAP[city.toLowerCase()] || city;
+  return CITY_SLUG_MAP[city.toLowerCase()] || null;
 }
 
 function sparkHeaders() {
@@ -118,4 +120,4 @@ async function getListingPhotos(listingKey) {
   }
 }
 
-module.exports = { getListings, getListing, getListingPhotos };
+module.exports = { getListings, getListing, getListingPhotos, VALID_CITY_SLUGS };

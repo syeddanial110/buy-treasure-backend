@@ -1,8 +1,16 @@
 const spark = require('../lib/spark');
+const { VALID_CITY_SLUGS } = spark;
 
 async function fetchListings(req, res, listingType) {
   try {
     const { page = 1, limit = 20, minPrice, maxPrice, beds, baths, city, propertyType, sortBy } = req.query;
+
+    if (city && !VALID_CITY_SLUGS.includes(city.toLowerCase())) {
+      return res.status(400).json({
+        error: `Invalid city. Supported values: ${VALID_CITY_SLUGS.join(', ')}`,
+      });
+    }
+
     const data = await spark.getListings({ page, limit, minPrice, maxPrice, beds, baths, city, propertyType, listingType, sortBy });
     res.json({
       listings: data.value || [],

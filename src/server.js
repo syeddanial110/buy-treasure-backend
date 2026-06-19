@@ -5,6 +5,7 @@ const cors = require('cors');
 const listingsRouter = require('./routes/listings');
 const leadsRouter    = require('./routes/leads');
 const authRouter     = require('./routes/auth');
+const emailRouter    = require('./routes/email');
 
 const app = express();
 
@@ -29,8 +30,9 @@ app.use(express.json());
 app.get('/api/health', (_req, res) => res.json({ status: 'ok', ts: new Date().toISOString() }));
 
 app.use('/api/listings', listingsRouter);
-app.use('/api/leads',    leadsRouter);
+app.use('/api/listing-leads', leadsRouter);
 app.use('/api/auth',     authRouter);
+app.use('/api/email',    emailRouter);
 
 app.use((err, _req, res, _next) => {
   console.error('[server] unhandled error:', err.message);
