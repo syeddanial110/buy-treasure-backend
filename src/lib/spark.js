@@ -120,4 +120,4 @@ async function getListingPhotos(listingKey) {
   }
 }
 
-module.exports = { getListings, getListing, getListingPhotos, VALID_CITY_SLUGS };
+module.exports = { getListings, getListing, getListingPhotos, VALID_CITY_SLUGS, CITY_SLUG_MAP };

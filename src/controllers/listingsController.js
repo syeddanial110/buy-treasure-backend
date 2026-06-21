@@ -1,5 +1,5 @@
 const spark = require('../lib/spark');
-const { VALID_CITY_SLUGS } = spark;
+const { VALID_CITY_SLUGS, CITY_SLUG_MAP } = spark;
 
 async function fetchListings(req, res, listingType) {
   try {
@@ -58,4 +58,36 @@ async function getListingPhotos(req, res) {
   }
 }
 
-module.exports = { getListings, getSaleListings, getRentListings, getFilteredListings, getListing, getListingPhotos };
+async function getTopAreaListings(req, res) {
+  try {
+    const { city } = req.params;
+    const { page = 1, limit = 20, minPrice, maxPrice, beds, baths, type, sortBy } = req.query;
+
+    const slug = city.toLowerCase();
+    if (!CITY_SLUG_MAP[slug]) {
+      return res.status(400).json({
+        error: `Invalid city. Supported values: ${Object.keys(CITY_SLUG_MAP).filter(k => !k.includes(' ')).join(', ')}`,
+      });
+    }
+
+    const data = await spark.getListings({
+      page, limit, minPrice, maxPrice, beds, baths,
+      city: slug,
+      listingType: type || null,
+      sortBy,
+    });
+
+    res.json({
+      city: CITY_SLUG_MAP[slug],
+      listings: data.value || [],
+      total: data['@odata.count'] || 0,
+      page: Number(page),
+      limit: Number(limit),
+    });
+  } catch (err) {
+    console.error('[listingsController] getTopAreaListings:', err.message);
+    res.status(500).json({ error: 'Failed to fetch listings' });
+  }
+}
+
+module.exports = { getListings, getSaleListings, getRentListings, getFilteredListings, getListing, getListingPhotos, getTopAreaListings };
