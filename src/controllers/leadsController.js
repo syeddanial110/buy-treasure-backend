@@ -2,20 +2,15 @@ const db = require('../lib/db');
 
 async function createLead(req, res) {
   try {
-    const { name, email, phone, message, listing_key, listing_address, listing_price, leadType } = req.body;
+    const { name, email, phone, message, listing_key, listing_address, listing_price } = req.body;
 
     if (!name || !email) {
       return res.status(400).json({ error: 'name and email are required' });
     }
 
-    const VALID_LEAD_TYPES = ['listing-detail', 'popup-form'];
-    if (leadType && !VALID_LEAD_TYPES.includes(leadType)) {
-      return res.status(400).json({ error: `leadType must be one of: ${VALID_LEAD_TYPES.join(', ')}` });
-    }
-
     const [result] = await db.execute(
-      `INSERT INTO leads (name, email, phone, message, listing_key, listing_address, listing_price, lead_type)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO listing_leads (name, email, phone, message, listing_key, listing_address, listing_price)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [
         name,
         email,
@@ -24,7 +19,6 @@ async function createLead(req, res) {
         listing_key     || null,
         listing_address || null,
         listing_price   || null,
-        leadType        || null,
       ]
     );
 
@@ -37,7 +31,7 @@ async function createLead(req, res) {
 
 async function getLeads(req, res) {
   try {
-    const [rows] = await db.execute('SELECT * FROM leads ORDER BY created_at DESC');
+    const [rows] = await db.execute('SELECT * FROM listing_leads ORDER BY created_at DESC');
     res.json({ leads: rows });
   } catch (err) {
     console.error('[leadsController] getLeads:', err.message);
@@ -48,7 +42,7 @@ async function getLeads(req, res) {
 async function deleteLead(req, res) {
   try {
     const { id } = req.params;
-    const [result] = await db.execute('DELETE FROM leads WHERE id = ?', [id]);
+    const [result] = await db.execute('DELETE FROM listing_leads WHERE id = ?', [id]);
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Lead not found' });

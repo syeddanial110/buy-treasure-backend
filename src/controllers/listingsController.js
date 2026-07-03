@@ -90,4 +90,20 @@ async function getTopAreaListings(req, res) {
   }
 }
 
-module.exports = { getListings, getSaleListings, getRentListings, getFilteredListings, getListing, getListingPhotos, getTopAreaListings };
+async function getInHouseListings(req, res) {
+  try {
+    const { page = 1, limit = 20, sortBy } = req.query;
+    const data = await spark.getInHouseListings({ page, limit, sortBy });
+    res.json({
+      listings: data.value || [],
+      total: data['@odata.count'] || 0,
+      page: Number(page),
+      limit: Number(limit),
+    });
+  } catch (err) {
+    console.error('[listingsController] getInHouseListings:', err.message);
+    res.status(500).json({ error: 'Failed to fetch in-house listings' });
+  }
+}
+
+module.exports = { getListings, getSaleListings, getRentListings, getFilteredListings, getListing, getListingPhotos, getTopAreaListings, getInHouseListings };

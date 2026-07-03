@@ -4,6 +4,9 @@ const BASE_URL = 'https://replication.sparkapi.com/Version/3/Reso/OData';
 
 const escOData = (s) => String(s).replace(/'/g, "''");
 
+const BRANCA_REALTY_OFFICE_KEY    = '20241204053833553112000000'; // used for filtering
+const BRANCA_REALTY_OFFICE_MLS_ID = '802380';                    // for display only
+
 // All supported Treasure Coast cities
 const TREASURE_COAST_CITIES = [
   'Port St. Lucie',
@@ -86,6 +89,42 @@ async function getListings({ page = 1, limit = 20, minPrice, maxPrice, beds, bat
   return response.data;
 }
 
+async function getInHouseListings({ page = 1, limit = 20, sortBy } = {}) {
+  const top      = Math.min(Math.max(Number(limit) || 1, 1), 100);
+  const safePage = Math.max(Number(page) || 1, 1);
+  const skip     = (safePage - 1) * top;
+  const orderby  = SORT_MAP[sortBy] || SORT_MAP['newest'];
+
+  const filter = `StandardStatus eq 'Active' and ListOfficeKey eq '${BRANCA_REALTY_OFFICE_KEY}'`;
+
+  const response = await axios.get(`${BASE_URL}/Property`, {
+    headers: sparkHeaders(),
+    params: {
+      $top: top,
+      $skip: skip,
+      $filter: filter,
+      $orderby: orderby,
+      $count: true,
+      $expand: 'Media($top=4)',
+    },
+  });
+
+  return response.data;
+}
+
+async function getInHouseListingsCount() {
+  const response = await axios.get(`${BASE_URL}/Property`, {
+    headers: sparkHeaders(),
+    params: {
+      $filter: `StandardStatus eq 'Active' and ListOfficeKey eq '${BRANCA_REALTY_OFFICE_KEY}'`,
+      $count: true,
+      $top: 0,
+    },
+  });
+
+  return response.data['@odata.count'] || 0;
+}
+
 async function getListing(listingKey) {
   const response = await axios.get(`${BASE_URL}/Property('${escOData(listingKey)}')`, {
     headers: sparkHeaders(),
@@ -120,4 +159,9 @@ async function getListingPhotos(listingKey) {
   }
 }
 
-module.exports = { getListings, getListing, getListingPhotos, VALID_CITY_SLUGS, CITY_SLUG_MAP };
+module.exports = {
+  getListings, getListing, getListingPhotos,
+  getInHouseListings, getInHouseListingsCount,
+  VALID_CITY_SLUGS, CITY_SLUG_MAP,
+  BRANCA_REALTY_OFFICE_KEY, BRANCA_REALTY_OFFICE_MLS_ID,
+};

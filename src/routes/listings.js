@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const { getListings, getSaleListings, getRentListings, getFilteredListings, getListing, getListingPhotos, getTopAreaListings } = require('../controllers/listingsController');
+const { getListings, getSaleListings, getRentListings, getFilteredListings, getListing, getListingPhotos, getTopAreaListings, getInHouseListings } = require('../controllers/listingsController');
 
 router.get('/', getListings);
 router.get('/sale', getSaleListings);
 router.get('/rent', getRentListings);
 router.get('/filter', getFilteredListings);
 router.get('/top-areas/:city', getTopAreaListings);
+router.get('/in-house', getInHouseListings);
 router.get('/:listingKey/photos', getListingPhotos);
 router.get('/:listingKey', getListing);
 

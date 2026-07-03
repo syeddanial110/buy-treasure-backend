@@ -7,6 +7,7 @@ const leadsRouter      = require('./routes/leads');
 const authRouter       = require('./routes/auth');
 const emailRouter      = require('./routes/email');
 const homeValueRouter  = require('./routes/homeValue');
+const popupLeadsRouter = require('./routes/popupLeads');
 
 const app = express();
 
@@ -16,6 +17,8 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:3001',
   'http://localhost:5173',
+  "https://buytreasurecoastproperty.com/",
+  "https://admin.buytreasurecoastproperty.com/",
   'https://buy-treasure-fe.vercel.app/',
   'https://buy-treasure-admin.vercel.app/'
 ].filter(Boolean);
@@ -38,6 +41,7 @@ app.use('/api/listing-leads', leadsRouter);
 app.use('/api/auth',         authRouter);
 app.use('/api/email',        emailRouter);
 app.use('/api/home-value',   homeValueRouter);
+app.use('/api/popup-leads', popupLeadsRouter);
 
 app.use((err, _req, res, _next) => {
   console.error('[server] unhandled error:', err.message);

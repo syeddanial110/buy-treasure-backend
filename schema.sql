@@ -1,4 +1,4 @@
--- Run this in phpMyAdmin SQL tab on the `buytreasure` database
+-- Run this in phpMyAdmin SQL tab on the `buytreasurecoast_db` database
 
 CREATE TABLE IF NOT EXISTS leads (
   id               INT AUTO_INCREMENT PRIMARY KEY,
@@ -18,4 +18,15 @@ CREATE TABLE IF NOT EXISTS admin_users (
   email      VARCHAR(255) NOT NULL UNIQUE,
   password   VARCHAR(255) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS home_value_leads (
+  id               INT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  full_name        VARCHAR(255) NOT NULL,
+  email            VARCHAR(255) NOT NULL,
+  property_address TEXT         NOT NULL,
+  house_size       INT          DEFAULT NULL,
+  bedrooms         INT          DEFAULT NULL,
+  bathrooms        DECIMAL(3,1) DEFAULT NULL,
+  created_at       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

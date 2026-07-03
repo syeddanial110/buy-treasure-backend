@@ -2,10 +2,10 @@ const db = require('../lib/db');
 
 async function createHomeValueLead(req, res) {
   try {
-    const { full_name, email, property_address, house_size, bedrooms, bathrooms } = req.body;
+    const { name, email, phone, message } = req.body;
 
-    if (!full_name || !email || !property_address) {
-      return res.status(400).json({ error: 'full_name, email, and property_address are required' });
+    if (!name || !email) {
+      return res.status(400).json({ error: 'name and email are required' });
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -14,15 +14,13 @@ async function createHomeValueLead(req, res) {
     }
 
     const [result] = await db.execute(
-      `INSERT INTO home_value_leads (full_name, email, property_address, house_size, bedrooms, bathrooms)
-       VALUES (?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO home_value_leads (name, email, phone, message)
+       VALUES (?, ?, ?, ?)`,
       [
-        full_name,
+        name,
         email,
-        property_address,
-        house_size  ? Number(house_size)  : null,
-        bedrooms    ? Number(bedrooms)    : null,
-        bathrooms   ? Number(bathrooms)   : null,
+        phone   || null,
+        message || null,
       ]
     );
 
