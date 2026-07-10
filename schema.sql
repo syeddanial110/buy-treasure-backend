@@ -24,9 +24,20 @@ CREATE TABLE IF NOT EXISTS home_value_leads (
   id               INT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
   full_name        VARCHAR(255) NOT NULL,
   email            VARCHAR(255) NOT NULL,
+  phone            VARCHAR(50)  DEFAULT NULL,
+  message          TEXT,
   property_address TEXT         NOT NULL,
   house_size       INT          DEFAULT NULL,
   bedrooms         INT          DEFAULT NULL,
   bathrooms        DECIMAL(3,1) DEFAULT NULL,
+  created_at       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS popup_leads (
+  id               INT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  name             VARCHAR(255) NOT NULL,
+  email            VARCHAR(255) NOT NULL,
+  phone            VARCHAR(50)  DEFAULT NULL,
+  interested_area  VARCHAR(255) DEFAULT NULL,
   created_at       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
