@@ -2,6 +2,25 @@ const axios = require('axios');
 
 const BASE_URL = 'https://replication.sparkapi.com/Version/3/Reso/OData';
 
+// ── In-memory cache ──────────────────────────────────────────────────────────
+const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
+const _cache = new Map();
+
+function cacheGet(key) {
+  const entry = _cache.get(key);
+  if (!entry) return null;
+  if (Date.now() > entry.expiresAt) { _cache.delete(key); return null; }
+  return entry.data;
+}
+function cacheSet(key, data) {
+  _cache.set(key, { data, expiresAt: Date.now() + CACHE_TTL_MS });
+}
+function clearCache() {
+  _cache.clear();
+  console.log('[spark] Listings cache cleared');
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 const escOData = (s) => String(s).replace(/'/g, "''");
 
 const BRANCA_REALTY_OFFICE_KEY    = '20241204053833553112000000'; // used for filtering
@@ -45,12 +64,16 @@ function sparkHeaders() {
 }
 
 const SORT_MAP = {
-  'newest':       'ListingContractDate desc',
+  'newest':       'ModificationTimestamp desc',
   'price-low':    'ListPrice asc',
   'price-high':   'ListPrice desc',
 };
 
 async function getListings({ page = 1, limit = 20, minPrice, maxPrice, beds, baths, city, propertyType, listingType, sortBy } = {}) {
+  const cacheKey = JSON.stringify({ fn: 'getListings', page, limit, minPrice, maxPrice, beds, baths, city, propertyType, listingType, sortBy });
+  const cached = cacheGet(cacheKey);
+  if (cached) return cached;
+
   const top      = Math.min(Math.max(Number(limit) || 1, 1), 100);
   const safePage = Math.max(Number(page) || 1, 1);
   const skip     = (safePage - 1) * top;
@@ -86,10 +109,15 @@ async function getListings({ page = 1, limit = 20, minPrice, maxPrice, beds, bat
     },
   });
 
+  cacheSet(cacheKey, response.data);
   return response.data;
 }
 
 async function getInHouseListings({ page = 1, limit = 20, sortBy } = {}) {
+  const cacheKey = JSON.stringify({ fn: 'getInHouseListings', page, limit, sortBy });
+  const cached = cacheGet(cacheKey);
+  if (cached) return cached;
+
   const top      = Math.min(Math.max(Number(limit) || 1, 1), 100);
   const safePage = Math.max(Number(page) || 1, 1);
   const skip     = (safePage - 1) * top;
@@ -109,10 +137,15 @@ async function getInHouseListings({ page = 1, limit = 20, sortBy } = {}) {
     },
   });
 
+  cacheSet(cacheKey, response.data);
   return response.data;
 }
 
 async function getInHouseListingsCount() {
+  const cacheKey = 'getInHouseListingsCount';
+  const cached = cacheGet(cacheKey);
+  if (cached !== null) return cached;
+
   const response = await axios.get(`${BASE_URL}/Property`, {
     headers: sparkHeaders(),
     params: {
@@ -122,7 +155,9 @@ async function getInHouseListingsCount() {
     },
   });
 
-  return response.data['@odata.count'] || 0;
+  const count = response.data['@odata.count'] || 0;
+  cacheSet(cacheKey, count);
+  return count;
 }
 
 async function getListing(listingKey) {
@@ -162,6 +197,7 @@ async function getListingPhotos(listingKey) {
 module.exports = {
   getListings, getListing, getListingPhotos,
   getInHouseListings, getInHouseListingsCount,
+  clearCache,
   VALID_CITY_SLUGS, CITY_SLUG_MAP,
   BRANCA_REALTY_OFFICE_KEY, BRANCA_REALTY_OFFICE_MLS_ID,
 };

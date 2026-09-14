@@ -1,5 +1,5 @@
 const spark = require('../lib/spark');
-const { VALID_CITY_SLUGS, CITY_SLUG_MAP } = spark;
+const { VALID_CITY_SLUGS, CITY_SLUG_MAP, clearCache } = spark;
 
 async function fetchListings(req, res, listingType) {
   try {
@@ -12,7 +12,7 @@ async function fetchListings(req, res, listingType) {
     }
 
     const data = await spark.getListings({ page, limit, minPrice, maxPrice, beds, baths, city, propertyType, listingType, sortBy });
-    res.json({
+    res.set('Cache-Control', 'no-store').json({
       listings: data.value || [],
       total: data['@odata.count'] || 0,
       page: Number(page),
@@ -77,7 +77,7 @@ async function getTopAreaListings(req, res) {
       sortBy,
     });
 
-    res.json({
+    res.set('Cache-Control', 'no-store').json({
       city: CITY_SLUG_MAP[slug],
       listings: data.value || [],
       total: data['@odata.count'] || 0,
@@ -94,7 +94,7 @@ async function getInHouseListings(req, res) {
   try {
     const { page = 1, limit = 20, sortBy } = req.query;
     const data = await spark.getInHouseListings({ page, limit, sortBy });
-    res.json({
+    res.set('Cache-Control', 'no-store').json({
       listings: data.value || [],
       total: data['@odata.count'] || 0,
       page: Number(page),
@@ -106,4 +106,9 @@ async function getInHouseListings(req, res) {
   }
 }
 
-module.exports = { getListings, getSaleListings, getRentListings, getFilteredListings, getListing, getListingPhotos, getTopAreaListings, getInHouseListings };
+async function clearListingsCache(req, res) {
+  clearCache();
+  res.json({ success: true, message: 'Listings cache cleared' });
+}
+
+module.exports = { getListings, getSaleListings, getRentListings, getFilteredListings, getListing, getListingPhotos, getTopAreaListings, getInHouseListings, clearListingsCache };

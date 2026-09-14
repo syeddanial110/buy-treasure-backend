@@ -41,3 +41,12 @@ CREATE TABLE IF NOT EXISTS popup_leads (
   interested_area  VARCHAR(255) DEFAULT NULL,
   created_at       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS contact_leads (
+  id         INT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  name       VARCHAR(255) NOT NULL,
+  email      VARCHAR(255) NOT NULL,
+  phone      VARCHAR(50)  DEFAULT NULL,
+  message    TEXT         DEFAULT NULL,
+  created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

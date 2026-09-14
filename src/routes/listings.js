@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { getListings, getSaleListings, getRentListings, getFilteredListings, getListing, getListingPhotos, getTopAreaListings, getInHouseListings } = require('../controllers/listingsController');
+const { getListings, getSaleListings, getRentListings, getFilteredListings, getListing, getListingPhotos, getTopAreaListings, getInHouseListings, clearListingsCache } = require('../controllers/listingsController');
+const { requireAuth } = require('../middleware/authMiddleware');
 
+router.get('/refresh', requireAuth, clearListingsCache);
 router.get('/', getListings);
 router.get('/sale', getSaleListings);
 router.get('/rent', getRentListings);

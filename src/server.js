@@ -6,8 +6,9 @@ const listingsRouter   = require('./routes/listings');
 const leadsRouter      = require('./routes/leads');
 const authRouter       = require('./routes/auth');
 const emailRouter      = require('./routes/email');
-const homeValueRouter  = require('./routes/homeValue');
-const popupLeadsRouter = require('./routes/popupLeads');
+const homeValueRouter    = require('./routes/homeValue');
+const popupLeadsRouter   = require('./routes/popupLeads');
+const contactLeadsRouter = require('./routes/contactLeads');
 
 const app = express();
 
@@ -41,7 +42,8 @@ app.use('/api/listing-leads', leadsRouter);
 app.use('/api/auth',         authRouter);
 app.use('/api/email',        emailRouter);
 app.use('/api/home-value',   homeValueRouter);
-app.use('/api/popup-leads', popupLeadsRouter);
+app.use('/api/popup-leads',   popupLeadsRouter);
+app.use('/api/contact-leads', contactLeadsRouter);
 
 app.use((err, _req, res, _next) => {
   console.error('[server] unhandled error:', err.message);
